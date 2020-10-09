@@ -178,8 +178,9 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
-      /* We need to register a serial stream.
-         1. */
+      /* 1. Need to add smos_DoWork()
+         2. Need to add smos_RegisterSerialStream()
+         3. Need to add smos_DecodeHexStringMessage() */
 };
 
 #endif
