@@ -1,2 +1,2 @@
 # SMoS-cpp
-Structured Messaging over Serial
+C++ utility library for [SMoS](https://github.com/ChrisDinhNZ/SMoS)
