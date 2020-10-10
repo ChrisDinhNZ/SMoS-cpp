@@ -38,12 +38,16 @@ void loop()
       {
          switch(smosObject.smos_EncodeGetMessage(1, SMOS_CONTENT_TYPE_GENERIC, 0, 1, &data, hexString))
          {
-            case SMOS_ERROR_OK:
+            case SMOS_RESULT_SUCCESS:
                Serial.println(hexString);
                break;
-            
+
+            case SMOS_RESULT_ERROR_EXCEED_MAX_DATA_SIZE:
+            case SMOS_RESULT_ERROR_NULL_POINTER:
+            case SMOS_RESULT_ERROR_ENCODE_MESSAGE:
+            case SMOS_RESULT_UNKNOWN:
             default:
-               Serial.println("SMOS_ERROR_INVALID_MESSAGE");
+               Serial.println("SMOS_RESULT_ERROR");
                break;
          }
 

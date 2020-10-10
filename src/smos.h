@@ -135,10 +135,13 @@ typedef enum smosCodeDetailResponse_t
    SMOS_CODE_DETAIL_SERVER_ERROR_PROXYING_NOT_SUPPORTED = 0x05
 };
 
-typedef enum smosError_t
+typedef enum smosResult_t
 {
-   SMOS_ERROR_OK,             /**< Error code for success or no error. */
-   SMOS_ERROR_INVALID_MESSAGE /**< Error code for error if an invalid message was received. */
+   SMOS_RESULT_UNKNOWN,
+   SMOS_RESULT_SUCCESS,
+   SMOS_RESULT_ERROR_EXCEED_MAX_DATA_SIZE,
+   SMOS_RESULT_ERROR_NULL_POINTER,
+   SMOS_RESULT_ERROR_ENCODE_MESSAGE
 };
 
 /**
@@ -171,7 +174,7 @@ class SMoS
          const smosObject_t *message,
          uint8_t contextByteIndex);
    public:      
-      smosError_t smos_EncodeGetMessage(
+      smosResult_t smos_EncodeGetMessage(
          uint8_t byteCount,
          smosContentType_t contentType,
          uint8_t contentTypeOptions,

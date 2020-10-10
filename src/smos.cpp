@@ -14,7 +14,7 @@
 /**
  * Takes the provided parameters and create a SMoS Hex string and assign it to hexString.
  */
-smosError_t SMoS::smos_EncodeGetMessage(
+smosResult_t SMoS::smos_EncodeGetMessage(
     uint8_t byteCount,
     smosContentType_t contentType,
     uint8_t contentTypeOptions,
@@ -26,12 +26,12 @@ smosError_t SMoS::smos_EncodeGetMessage(
 
    if (dataContent == NULL || hexString == NULL)
    {
-      return SMOS_ERROR_INVALID_MESSAGE;
+      return SMOS_RESULT_ERROR_NULL_POINTER;
    }
 
    if (byteCount > SMOS_MAX_DATA_BYTE_LEN)
    {
-      return SMOS_ERROR_INVALID_MESSAGE;
+      return SMOS_RESULT_ERROR_EXCEED_MAX_DATA_SIZE;
    }
 
    memset(&message, 0, sizeof(message));
@@ -51,10 +51,10 @@ smosError_t SMoS::smos_EncodeGetMessage(
 
    if (ConvertMessageToHexString(&message, hexString) == 0)
    {
-      return SMOS_ERROR_INVALID_MESSAGE;
+      return SMOS_RESULT_ERROR_ENCODE_MESSAGE;
    }
 
-   return SMOS_ERROR_OK;
+   return SMOS_RESULT_SUCCESS;
 }
 
 uint8_t SMoS::CreateChecksum(
