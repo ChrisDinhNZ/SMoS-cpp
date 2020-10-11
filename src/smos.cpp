@@ -9,7 +9,12 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "smos.h"
+
+/**********************
+ *** PUBLIC MEMBERS ***
+ **********************/
 
 /**
  * Takes the provided parameters and create a SMoS Hex string and assign it to hexString.
@@ -56,6 +61,35 @@ smosResult_t SMoS::smos_EncodeGetMessage(
 
    return SMOS_RESULT_SUCCESS;
 }
+
+/* As bytes are being sent across the wire, it would be nice to know how many bytes
+   we need to make up a message. */
+smosResult_t smos_GetExpectedHexStringLength(
+    const char *hexString,
+    const uint16_t hexStringLength,
+    uint8_t *expectedHexStringLength)
+{
+   char hexBuff[HEX_STR_LENGTH_PER_BYTE + 1]; /* Null terminated */
+
+   if (hexString == NULL || expectedHexStringLength == NULL)
+   {
+      return SMOS_RESULT_ERROR_NULL_POINTER;
+   }
+
+   if (hexStringLength < SMOS_HEX_STRING_MIN_LENGTH)
+   {
+      return SMOS_RESULT_ERROR_NOT_MIN_LENGTH_HEX_STRING;
+   }
+
+   strncpy(hexBuff, hexString + SMOS_HEX_STR_BYTECOUNT_OFFSET, HEX_STR_LENGTH_PER_BYTE);
+   hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
+   
+   return (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+}
+
+/***********************
+ *** PRIVATE MEMBERS ***
+ ***********************/
 
 uint8_t SMoS::CreateChecksum(
    const smosObject_t *message)

@@ -15,57 +15,60 @@
 typedef enum smosDefinitions_t
 {
    /* Start code */
-   SMOS_START_CODE_OFFSET = 0,
+   SMOS_HEX_STR_START_CODE_OFFSET = 0,
    SMOS_START_CODE_BYTE_LEN = 1,
 
    /* Byte count */
-   SMOS_COUNT_OFFSET = 1,
+   SMOS_HEX_STR_BYTECOUNT_OFFSET = 1,
    SMOS_COUNT_BYTE_LEN = 1,
 
    /* Context Overall */
    SMOS_DATA_CONTEXT_BYTE_LEN = 3,
 
    /* Context type */
-   SMOS_CONTEXT_TYPE_OFFSET = 2,
+   SMOS_HEX_STR_CONTEXT_TYPE_OFFSET = 3,
    SMOS_CONTEXT_TYPE_LSB_OFFSET = 6,
    SMOS_CONTEXT_TYPE_BIT_MASK = 0xC0,
 
    /* Content type */
-   SMOS_CONTENT_TYPE_OFFSET = 2,
+   SMOS_HEX_STR_CONTENT_TYPE_OFFSET = 3,
    SMOS_CONTENT_TYPE_LSB_OFFSET = 4,
    SMOS_CONTENT_TYPE_BIT_MASK = 0x30,
 
    /* Content type */
-   SMOS_CONTENT_TYPE_OPTIONS_OFFSET = 2,
+   SMOS_HEX_STR_CONTENT_TYPE_OPTIONS_OFFSET = 3,
    SMOS_CONTENT_TYPE_OPTIONS_LSB_OFFSET = 0,
    SMOS_CONTENT_TYPE_OPTIONS_BIT_MASK = 0x0F,
 
    /* Code class */
-   SMOS_CODE_CLASS_OFFSET = 3,
+   SMOS_HEX_STR_CODE_CLASS_OFFSET = 5,
    SMOS_CODE_CLASS_LSB_OFFSET = 5,
    SMOS_CODE_CLASS_BIT_MASK = 0xE0,
 
    /* Code detail */
-   SMOS_CODE_DETAIL_OFFSET = 3,
+   SMOS_HEX_STR_CODE_DETAIL_OFFSET = 5,
    SMOS_CODE_DETAIL_LSB_OFFSET = 0,
    SMOS_CODE_DETAIL_BIT_MASK = 0x1F,
 
    /* Message Id */
-   SMOS_MESSAGE_ID_OFFSET = 4,
+   SMOS_HEX_STR_MESSAGE_ID_OFFSET = 7,
    SMOS_MESSAGE_ID_LSB_OFFSET = 4,
    SMOS_MESSAGE_ID_BIT_MASK = 0xF0,
 
    /* Token Id */
-   SMOS_TOKEN_ID_OFFSET = 4,
+   SMOS_HEX_STR_TOKEN_ID_OFFSET = 7,
    SMOS_TOKEN_ID_LSB_OFFSET = 0,
    SMOS_TOKEN_ID_BIT_MASK = 0x0F,
 
    /* Data content */
-   SMOS_DATA_OFFSET = 5,
+   SMOS_HEX_STR_DATA_OFFSET = 9,
    SMOS_MAX_DATA_BYTE_LEN = 255,
 
    /* Checksum offset depends on Byte Count */
    SMOS_CHECKSUM_BYTE_LEN = 1,
+
+   /* SMoS minimum message length (i.e. when byte count is 0) */
+   SMOS_HEX_STRING_MIN_LENGTH = 11
 
    /* SMoS maximum message length */
    SMOS_MESSAGE_BUFF_SIZE = SMOS_START_CODE_BYTE_LEN +
@@ -75,6 +78,8 @@ typedef enum smosDefinitions_t
                             SMOS_CHECKSUM_BYTE_LEN,
 
    SMOS_START_CODE = 0x3A,
+
+   HEX_STR_LENGTH_PER_BYTE = 2
 };
 
 typedef enum smosContextType_t
@@ -141,7 +146,9 @@ typedef enum smosResult_t
    SMOS_RESULT_SUCCESS,
    SMOS_RESULT_ERROR_EXCEED_MAX_DATA_SIZE,
    SMOS_RESULT_ERROR_NULL_POINTER,
-   SMOS_RESULT_ERROR_ENCODE_MESSAGE
+   SMOS_RESULT_ERROR_ENCODE_MESSAGE,
+   SMOS_RESULT_ERROR_NOT_MIN_LENGTH_HEX_STRING,
+   SMOS_RESULT_ERROR_HEX_STRING_INCOMPLETE
 };
 
 /**
@@ -181,9 +188,10 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
-      /* 1. Need to add smos_DoWork()
-         2. Need to add smos_RegisterSerialStream()
-         3. Need to add smos_DecodeHexStringMessage() */
+      smosResult_t smos_GetExpectedHexStringLength(
+         const char *hexString,
+         const uint16_t hexStringLength,
+         uint8_t *expectedHexStringLength);
 };
 
 #endif
