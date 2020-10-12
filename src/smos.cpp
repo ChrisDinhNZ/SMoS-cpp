@@ -12,6 +12,109 @@
 #include <stdlib.h>
 #include "smos.h"
 
+
+/***********************
+ *** PRIVATE MEMBERS ***
+ ***********************/
+
+uint8_t SMoS::CreateChecksum(
+   const smosObject_t *message)
+{
+   uint8_t checksum, i;
+
+   /* Note that checksum does not include the start code ':' */
+   checksum = message->byteCount;
+   checksum += CalculateContextByteInfo(message, 0);
+   checksum += CalculateContextByteInfo(message, 1);
+   checksum += CalculateContextByteInfo(message, 2);
+
+   for (i = 0; i < message->byteCount; i++)
+   {
+      checksum += message->dataContent[i];
+   }
+
+   /* Two's complement on checksum */
+	checksum = ~checksum + 1;
+
+   return checksum;
+}
+
+bool SMoS::ValidateChecksum(
+    const uint8_t checksum,
+    const smosObject_t *message)
+{
+   return checksum == CreateChecksum(message);
+}
+
+uint16_t SMoS::ConvertMessageToHexString(
+   const smosObject_t *message,
+   char *hexString)
+{
+   uint8_t i;
+   uint16_t hexStringLength = 0;
+
+   if (message == NULL ||
+       hexString == NULL ||
+       message->byteCount > SMOS_MAX_DATA_BYTE_LEN)
+   {
+      return 0;
+   }
+
+   hexString += sprintf(hexString, "%c", message->startCode);
+   hexStringLength += 1;
+   hexString += sprintf(hexString, "%02X", message->byteCount);
+   hexStringLength += 2;
+   hexString += sprintf(hexString, "%02X", CalculateContextByteInfo(message, 0));
+   hexStringLength += 2;
+   hexString += sprintf(hexString, "%02X", CalculateContextByteInfo(message, 1));
+   hexStringLength += 2;
+   hexString += sprintf(hexString, "%02X", CalculateContextByteInfo(message, 2));
+   hexStringLength += 2;
+
+   for (i = 0; i < message->byteCount; i++)
+   {
+      hexString += sprintf(hexString, "%02X", message->dataContent[i]);
+      hexStringLength += 2;
+   }
+
+   hexString += sprintf(hexString, "%02X", message->checksum);
+   hexStringLength += 2;
+
+   return hexStringLength;
+}
+
+uint8_t SMoS::CalculateContextByteInfo(
+    const smosObject_t *message,
+    uint8_t contextByteIndex)
+{
+   uint8_t tempByte = 0;
+
+   switch (contextByteIndex)
+   {
+      case 0:
+         tempByte |= ((message->contextType << SMOS_CONTEXT_TYPE_LSB_OFFSET) & SMOS_CONTEXT_TYPE_BIT_MASK);
+         tempByte |= ((message->contentType << SMOS_CONTENT_TYPE_LSB_OFFSET) & SMOS_CONTENT_TYPE_BIT_MASK);
+         tempByte |= ((message->contentTypeOptions << SMOS_CONTENT_TYPE_OPTIONS_LSB_OFFSET) & SMOS_CONTENT_TYPE_OPTIONS_BIT_MASK);
+         break;
+
+      case 1:
+         tempByte |= ((message->codeClass << SMOS_CODE_CLASS_LSB_OFFSET) & SMOS_CODE_CLASS_BIT_MASK);
+         tempByte |= ((message->codeDetail << SMOS_CODE_DETAIL_LSB_OFFSET) & SMOS_CODE_DETAIL_BIT_MASK);
+         break;
+
+      case 2:
+         tempByte |= ((message->messageId << SMOS_MESSAGE_ID_LSB_OFFSET) & SMOS_MESSAGE_ID_BIT_MASK);
+         tempByte |= ((message->tokenId << SMOS_TOKEN_ID_LSB_OFFSET) & SMOS_TOKEN_ID_BIT_MASK);
+         break;
+
+      default:
+         break;
+   }
+
+   return tempByte;
+}
+
+
 /**********************
  *** PUBLIC MEMBERS ***
  **********************/
@@ -173,106 +276,5 @@ smosResult_t SMoS::smos_DecodeHexString(
 uint16_t SMoS::smos_GetMinimumHexStringLength(void)
 {
    return SMOS_HEX_STRING_MIN_LENGTH;
-}
-
-/***********************
- *** PRIVATE MEMBERS ***
- ***********************/
-
-uint8_t SMoS::CreateChecksum(
-   const smosObject_t *message)
-{
-   uint8_t checksum, i;
-
-   /* Note that checksum does not include the start code ':' */
-   checksum = message->byteCount;
-   checksum += CalculateContextByteInfo(message, 0);
-   checksum += CalculateContextByteInfo(message, 1);
-   checksum += CalculateContextByteInfo(message, 2);
-
-   for (i = 0; i < message->byteCount; i++)
-   {
-      checksum += message->dataContent[i];
-   }
-
-   /* Two's complement on checksum */
-	checksum = ~checksum + 1;
-
-   return checksum;
-}
-
-bool SMoS::ValidateChecksum(
-    const uint8_t checksum,
-    const smosObject_t *message)
-{
-   return checksum == CreateChecksum(message);
-}
-
-uint16_t SMoS::ConvertMessageToHexString(
-   const smosObject_t *message,
-   char *hexString)
-{
-   uint8_t i;
-   uint16_t hexStringLength = 0;
-
-   if (message == NULL ||
-       hexString == NULL ||
-       message->byteCount > SMOS_MAX_DATA_BYTE_LEN)
-   {
-      return 0;
-   }
-
-   hexString += sprintf(hexString, "%c", message->startCode);
-   hexStringLength += 1;
-   hexString += sprintf(hexString, "%02X", message->byteCount);
-   hexStringLength += 2;
-   hexString += sprintf(hexString, "%02X", CalculateContextByteInfo(message, 0));
-   hexStringLength += 2;
-   hexString += sprintf(hexString, "%02X", CalculateContextByteInfo(message, 1));
-   hexStringLength += 2;
-   hexString += sprintf(hexString, "%02X", CalculateContextByteInfo(message, 2));
-   hexStringLength += 2;
-
-   for (i = 0; i < message->byteCount; i++)
-   {
-      hexString += sprintf(hexString, "%02X", message->dataContent[i]);
-      hexStringLength += 2;
-   }
-
-   hexString += sprintf(hexString, "%02X", message->checksum);
-   hexStringLength += 2;
-
-   return hexStringLength;
-}
-
-uint8_t SMoS::CalculateContextByteInfo(
-    const smosObject_t *message,
-    uint8_t contextByteIndex)
-{
-   uint8_t tempByte = 0;
-
-   switch (contextByteIndex)
-   {
-      case 0:
-         tempByte |= ((message->contextType << SMOS_CONTEXT_TYPE_LSB_OFFSET) & SMOS_CONTEXT_TYPE_BIT_MASK);
-         tempByte |= ((message->contentType << SMOS_CONTENT_TYPE_LSB_OFFSET) & SMOS_CONTENT_TYPE_BIT_MASK);
-         tempByte |= ((message->contentTypeOptions << SMOS_CONTENT_TYPE_OPTIONS_LSB_OFFSET) & SMOS_CONTENT_TYPE_OPTIONS_BIT_MASK);
-         break;
-
-      case 1:
-         tempByte |= ((message->codeClass << SMOS_CODE_CLASS_LSB_OFFSET) & SMOS_CODE_CLASS_BIT_MASK);
-         tempByte |= ((message->codeDetail << SMOS_CODE_DETAIL_LSB_OFFSET) & SMOS_CODE_DETAIL_BIT_MASK);
-         break;
-
-      case 2:
-         tempByte |= ((message->messageId << SMOS_MESSAGE_ID_LSB_OFFSET) & SMOS_MESSAGE_ID_BIT_MASK);
-         tempByte |= ((message->tokenId << SMOS_TOKEN_ID_LSB_OFFSET) & SMOS_TOKEN_ID_BIT_MASK);
-         break;
-
-      default:
-         break;
-   }
-
-   return tempByte;
 }
 
