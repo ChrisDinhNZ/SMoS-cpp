@@ -19,7 +19,7 @@ void setup()
 
    memset(data, 0, sizeof(data));
    data[0] = 1;
-   data[1] = 1;
+   data[1] = 0;
    hexString = "";
 
    pinMode(LED_BUILTIN, OUTPUT);
