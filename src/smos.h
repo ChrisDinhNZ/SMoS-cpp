@@ -68,7 +68,7 @@ typedef enum smosDefinitions_t
    SMOS_CHECKSUM_BYTE_LEN = 1,
 
    /* SMoS minimum message length (i.e. when byte count is 0) */
-   SMOS_HEX_STRING_MIN_LENGTH = 11
+   SMOS_HEX_STRING_MIN_LENGTH = 11,
 
    /* SMoS maximum message length */
    SMOS_MESSAGE_BUFF_SIZE = SMOS_START_CODE_BYTE_LEN +

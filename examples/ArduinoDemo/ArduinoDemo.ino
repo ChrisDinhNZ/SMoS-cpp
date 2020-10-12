@@ -11,12 +11,15 @@ static SMoS smosObject;
 static char *hexString;
 unsigned int secSinceBoot;
 static bool done;
-static uint8_t data;
+static uint8_t data[SMOS_MAX_DATA_BYTE_LEN];
 
 void setup()
 {
    done = false;
-   data = 1;
+
+   memset(data, 0, sizeof(data));
+   data[0] = 1;
+   data[1] = 1;
    hexString = "";
 
    pinMode(LED_BUILTIN, OUTPUT);
@@ -36,7 +39,7 @@ void loop()
 
       if (!done)
       {
-         switch(smosObject.smos_EncodeGetMessage(1, SMOS_CONTENT_TYPE_GENERIC, 0, 1, &data, hexString))
+         switch(smosObject.smos_EncodePutMessage(2, SMOS_CONTENT_TYPE_GENERIC, 0, 2, data, hexString))
          {
             case SMOS_RESULT_SUCCESS:
                Serial.println(hexString);
