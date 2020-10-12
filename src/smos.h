@@ -193,6 +193,13 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
+      smosResult_t smos_EncodePutMessage(
+         uint8_t byteCount,
+         smosContentType_t contentType,
+         uint8_t contentTypeOptions,
+         uint8_t messageId,
+         const uint8_t *dataContent,
+         char *hexString);
       smosResult_t smos_GetExpectedHexStringLength(
          const char *hexString,
          const uint16_t hexStringLength,
