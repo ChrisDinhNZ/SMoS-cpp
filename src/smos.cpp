@@ -87,6 +87,89 @@ smosResult_t smos_GetExpectedHexStringLength(
    return (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
 }
 
+smosResult_t smos_DecodeHexString(
+    const char *hexString,
+    const uint16_t hexStringLength,
+    smosObject_t *message)
+{
+   uint8_t currentByte, i;
+   char hexBuff[HEX_STR_LENGTH_PER_BYTE + 1]; /* Null terminated */
+
+
+   if (hexString == NULL || message == NULL)
+   {
+      return SMOS_RESULT_ERROR_NULL_POINTER;
+   }
+
+   if (hexStringLength < SMOS_HEX_STRING_MIN_LENGTH)
+   {
+      return SMOS_RESULT_ERROR_NOT_MIN_LENGTH_HEX_STRING;
+   }
+
+   strncpy(hexBuff, hexString + SMOS_HEX_STR_BYTECOUNT_OFFSET, HEX_STR_LENGTH_PER_BYTE);
+   hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
+   currentByte = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+
+   /* Check Hex string length. Note that actual Hex string length will be truncated (ignored)
+      if longer than expected Hex string length. */
+   if (hexStringLength < SMOS_HEX_STRING_MIN_LENGTH + currentByte)
+   {
+      return SMOS_RESULT_ERROR_HEX_STRING_INCOMPLETE;
+   }
+
+   if (hexString[0] != SMOS_START_CODE)
+   {
+      return SMOS_RESULT_ERROR_HEX_STRING_INVALID_STARTCODE;
+   }
+
+   message->startCode = hexString[0];
+   message->byteCount = currentByte;
+
+   strncpy(hexBuff, hexString + SMOS_HEX_STR_CONTEXT_TYPE_OFFSET, HEX_STR_LENGTH_PER_BYTE);
+   hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
+   currentByte = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+
+   message->contextType = (currentByte & SMOS_CONTEXT_TYPE_BIT_MASK ) >> SMOS_CONTEXT_TYPE_LSB_OFFSET;
+   message->contentType = (currentByte & SMOS_CONTENT_TYPE_BIT_MASK ) >> SMOS_CONTENT_TYPE_LSB_OFFSET;
+   message->contentTypeOptions = (currentByte & SMOS_CONTENT_TYPE_OPTIONS_BIT_MASK ) >> SMOS_CONTENT_TYPE_OPTIONS_LSB_OFFSET;
+
+   strncpy(hexBuff, hexString + SMOS_HEX_STR_CODE_CLASS_OFFSET, HEX_STR_LENGTH_PER_BYTE);
+   hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
+   currentByte = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+
+   message->codeClass = (currentByte & SMOS_CODE_CLASS_BIT_MASK ) >> SMOS_CODE_CLASS_LSB_OFFSET;
+   message->codeDetail = (currentByte & SMOS_CODE_DETAIL_BIT_MASK ) >> SMOS_CODE_DETAIL_LSB_OFFSET;
+
+   strncpy(hexBuff, hexString + SMOS_HEX_STR_MESSAGE_ID_OFFSET, HEX_STR_LENGTH_PER_BYTE);
+   hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
+   currentByte = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+
+   message->messageId = (currentByte & SMOS_MESSAGE_ID_BIT_MASK ) >> SMOS_MESSAGE_ID_LSB_OFFSET;
+   message->tokenId = (currentByte & SMOS_TOKEN_ID_BIT_MASK ) >> SMOS_TOKEN_ID_LSB_OFFSET;
+
+   /* Decode data content. */
+   for (i = 0; i < message->byteCount; i++)
+   {
+      /* Times two i because every byte is represented by two ASCII hex characters */
+      strncpy(hexBuff, hexString + SMOS_HEX_STR_DATA_OFFSET + 2 * i, HEX_STR_LENGTH_PER_BYTE);
+      hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
+      message->dataContent[i] = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+   }
+
+   strncpy(hexBuff, hexString + SMOS_HEX_STR_DATA_OFFSET + message->byteCount * 2, HEX_STR_LENGTH_PER_BYTE);
+   hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
+   currentByte = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+
+   message->checksum = currentByte;
+
+   if (!ValidateChecksum(message->checksum, message))
+   {
+      return SMOS_RESULT_ERROR_HEX_STRING_INVALID_CHECKSUM;
+   }
+
+   return SMOS_RESULT_SUCCESS;
+}
+
 /***********************
  *** PRIVATE MEMBERS ***
  ***********************/
@@ -96,6 +179,7 @@ uint8_t SMoS::CreateChecksum(
 {
    uint8_t checksum, i;
 
+   /* Note that checksum does not include the start code ':' */
    checksum = message->byteCount;
    checksum += CalculateContextByteInfo(message, 0);
    checksum += CalculateContextByteInfo(message, 1);
@@ -110,6 +194,13 @@ uint8_t SMoS::CreateChecksum(
 	checksum = ~checksum + 1;
 
    return checksum;
+}
+
+bool SMoS::ValidateChecksum(
+    const uint8_t checksum,
+    const smosObject_t *message)
+{
+   return checksum == CreateChecksum(message);
 }
 
 uint16_t SMoS::ConvertMessageToHexString(

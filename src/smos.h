@@ -148,7 +148,9 @@ typedef enum smosResult_t
    SMOS_RESULT_ERROR_NULL_POINTER,
    SMOS_RESULT_ERROR_ENCODE_MESSAGE,
    SMOS_RESULT_ERROR_NOT_MIN_LENGTH_HEX_STRING,
-   SMOS_RESULT_ERROR_HEX_STRING_INCOMPLETE
+   SMOS_RESULT_ERROR_HEX_STRING_INCOMPLETE,
+   SMOS_RESULT_ERROR_HEX_STRING_INVALID_STARTCODE,
+   SMOS_RESULT_ERROR_HEX_STRING_INVALID_CHECKSUM
 };
 
 /**
@@ -174,6 +176,9 @@ class SMoS
    private:
       uint8_t CreateChecksum(
          const smosObject_t *message);
+      bool ValidateChecksum(
+         const uint8_t checksum,
+         const smosObject_t *message);
       uint16_t ConvertMessageToHexString(
          const smosObject_t *message,
          char *hexString);
@@ -192,6 +197,10 @@ class SMoS
          const char *hexString,
          const uint16_t hexStringLength,
          uint8_t *expectedHexStringLength);
+      smosResult_t smos_DecodeHexString(
+         const char *hexString,
+         const uint16_t hexStringLength,
+         smosObject_t *message);
 };
 
 #endif
