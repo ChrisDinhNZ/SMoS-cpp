@@ -64,7 +64,7 @@ smosResult_t SMoS::smos_EncodeGetMessage(
 
 /* As bytes are being sent across the wire, it would be nice to know how many bytes
    we need to make up a message. */
-smosResult_t smos_GetExpectedHexStringLength(
+smosResult_t SMoS::smos_GetExpectedHexStringLength(
     const char *hexString,
     const uint16_t hexStringLength,
     uint8_t *expectedHexStringLength)
@@ -87,7 +87,7 @@ smosResult_t smos_GetExpectedHexStringLength(
    return (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
 }
 
-smosResult_t smos_DecodeHexString(
+smosResult_t SMoS::smos_DecodeHexString(
     const char *hexString,
     const uint16_t hexStringLength,
     smosObject_t *message)
@@ -168,6 +168,11 @@ smosResult_t smos_DecodeHexString(
    }
 
    return SMOS_RESULT_SUCCESS;
+}
+
+uint16_t SMoS::smos_GetMinimumHexStringLength(void)
+{
+   return SMOS_HEX_STRING_MIN_LENGTH;
 }
 
 /***********************

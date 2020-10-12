@@ -201,6 +201,7 @@ class SMoS
          const char *hexString,
          const uint16_t hexStringLength,
          smosObject_t *message);
+      uint16_t smos_GetMinimumHexStringLength(void);
 };
 
 #endif
