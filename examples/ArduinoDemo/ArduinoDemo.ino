@@ -19,7 +19,7 @@ void setup()
 
    memset(data, 0, sizeof(data));
    data[0] = 1;
-   data[1] = 0;
+   data[1] = 1;
    hexString = "";
 
    pinMode(LED_BUILTIN, OUTPUT);
@@ -39,7 +39,14 @@ void loop()
 
       if (!done)
       {
-         switch(smosObject.smos_EncodePutMessage(2, SMOS_CONTENT_TYPE_GENERIC, 0, 2, data, hexString))
+         switch (smosObject.smos_EncodePiggyBackAckMessage(2,
+                                                           SMOS_CONTENT_TYPE_GENERIC,
+                                                           0,
+                                                           SMOS_CODE_CLASS_RESP_SUCCESS,
+                                                           SMOS_CODE_DETAIL_SUCCESS_CONTENT,
+                                                           1,
+                                                           data,
+                                                           hexString))
          {
             case SMOS_RESULT_SUCCESS:
                Serial.println(hexString);
