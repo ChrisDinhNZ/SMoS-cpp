@@ -212,6 +212,15 @@ class SMoS
       smosResult_t smos_EncodeEmptyAckMessage(
          uint8_t messageId,
          char *hexString);
+      smosResult_t smos_EncodeNonConfirmableResponseMessage(
+         uint8_t byteCount,
+         smosContentType_t contentType,
+         uint8_t contentTypeOptions,
+         smosCodeClass_t codeClass,
+         smosCodeDetailResponse_t codeDetailResponse,
+         uint8_t messageId,
+         const uint8_t *dataContent,
+         char *hexString);
       smosResult_t smos_GetExpectedHexStringLength(
          const char *hexString,
          const uint16_t hexStringLength,

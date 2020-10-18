@@ -39,7 +39,14 @@ void loop()
 
       if (!done)
       {
-         switch (smosService.smos_EncodeEmptyAckMessage(2, hexString))
+         switch (smosService.smos_EncodeNonConfirmableResponseMessage(2,
+                                                                      SMOS_CONTENT_TYPE_GENERIC,
+                                                                      0,
+                                                                      SMOS_CODE_CLASS_RESP_SUCCESS,
+                                                                      SMOS_CODE_DETAIL_SUCCESS_CHANGED,
+                                                                      4,
+                                                                      data,
+                                                                      hexString))
          {
             case SMOS_RESULT_SUCCESS:
                Serial.println(hexString);

@@ -277,6 +277,51 @@ smosResult_t SMoS::smos_EncodeEmptyAckMessage(
    return SMOS_RESULT_SUCCESS;
 }
 
+smosResult_t SMoS::smos_EncodeNonConfirmableResponseMessage(
+    uint8_t byteCount,
+    smosContentType_t contentType,
+    uint8_t contentTypeOptions,
+    smosCodeClass_t codeClass,
+    smosCodeDetailResponse_t codeDetailResponse,
+    uint8_t messageId,
+    const uint8_t *dataContent,
+    char *hexString)
+{
+   smosObject_t message;
+
+   if (dataContent == NULL || hexString == NULL)
+   {
+      return SMOS_RESULT_ERROR_NULL_POINTER;
+   }
+
+   if (byteCount > SMOS_MAX_DATA_BYTE_LEN)
+   {
+      return SMOS_RESULT_ERROR_EXCEED_MAX_DATA_SIZE;
+   }
+
+   memset(&message, 0, sizeof(message));
+   hexString[0] = 0;
+
+   message.startCode = SMOS_START_CODE;
+   message.byteCount = byteCount;
+   message.contextType = SMOS_CONTEXT_TYPE_NON;
+   message.contentType = contentType;
+   message.contentTypeOptions = contentTypeOptions;
+   message.codeClass = codeClass;
+   message.codeDetail = codeDetailResponse;
+   message.messageId = messageId;
+   message.tokenId = 0;
+   memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+   message.checksum = CreateChecksum(&message);
+
+   if (ConvertMessageToHexString(&message, hexString) == 0)
+   {
+      return SMOS_RESULT_ERROR_ENCODE_MESSAGE;
+   }
+
+   return SMOS_RESULT_SUCCESS;
+}
+
 /* As bytes are being sent across the wire, it would be nice to know how many bytes
    we need to make up a message. */
 smosResult_t SMoS::smos_GetExpectedHexStringLength(
