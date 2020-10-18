@@ -7,7 +7,7 @@
 #include "smos.h"
 #include "Arduino.h"
 
-static SMoS smosObject;
+static SMoS smosService;
 static char *hexString;
 unsigned int secSinceBoot;
 static bool done;
@@ -39,7 +39,7 @@ void loop()
 
       if (!done)
       {
-         switch (smosObject.smos_EncodeEmptyAckMessage(2, hexString))
+         switch (smosService.smos_EncodeEmptyAckMessage(2, hexString))
          {
             case SMOS_RESULT_SUCCESS:
                Serial.println(hexString);
