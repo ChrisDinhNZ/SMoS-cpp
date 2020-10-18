@@ -250,6 +250,33 @@ smosResult_t SMoS::smos_EncodePiggyBackAckMessage(
    return SMOS_RESULT_SUCCESS;
 }
 
+smosResult_t SMoS::smos_EncodeEmptyAckMessage(
+         uint8_t messageId,
+         char *hexString)
+{
+   smosObject_t message;
+
+   if (hexString == NULL)
+   {
+      return SMOS_RESULT_ERROR_NULL_POINTER;
+   }
+
+   memset(&message, 0, sizeof(message));
+   hexString[0] = 0;
+
+   message.startCode = SMOS_START_CODE;
+   message.contextType = SMOS_CONTEXT_TYPE_ACK;
+   message.messageId = messageId;
+   message.checksum = CreateChecksum(&message);
+
+   if (ConvertMessageToHexString(&message, hexString) == 0)
+   {
+      return SMOS_RESULT_ERROR_ENCODE_MESSAGE;
+   }
+
+   return SMOS_RESULT_SUCCESS;
+}
+
 /* As bytes are being sent across the wire, it would be nice to know how many bytes
    we need to make up a message. */
 smosResult_t SMoS::smos_GetExpectedHexStringLength(

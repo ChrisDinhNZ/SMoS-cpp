@@ -209,6 +209,9 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
+      smosResult_t smos_EncodeEmptyAckMessage(
+         uint8_t messageId,
+         char *hexString);
       smosResult_t smos_GetExpectedHexStringLength(
          const char *hexString,
          const uint16_t hexStringLength,
