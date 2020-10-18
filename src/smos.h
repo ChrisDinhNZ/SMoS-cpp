@@ -221,15 +221,16 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
-      smosResult_t smos_GetExpectedHexStringLength(
-         const char *hexString,
-         const uint16_t hexStringLength,
-         uint8_t *expectedHexStringLength);
       smosResult_t smos_DecodeHexString(
          const char *hexString,
          const uint16_t hexStringLength,
          smosObject_t *message);
+      smosResult_t smos_GetExpectedHexStringLength(
+         const char *hexString,
+         const uint16_t hexStringLength,
+         uint8_t *expectedHexStringLength);
       uint16_t smos_GetMinimumHexStringLength(void);
+      bool smos_IsStartCode(const char c);
 };
 
 #endif

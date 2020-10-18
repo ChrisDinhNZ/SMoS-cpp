@@ -322,31 +322,6 @@ smosResult_t SMoS::smos_EncodeNonConfirmableResponseMessage(
    return SMOS_RESULT_SUCCESS;
 }
 
-/* As bytes are being sent across the wire, it would be nice to know how many bytes
-   we need to make up a message. */
-smosResult_t SMoS::smos_GetExpectedHexStringLength(
-    const char *hexString,
-    const uint16_t hexStringLength,
-    uint8_t *expectedHexStringLength)
-{
-   char hexBuff[HEX_STR_LENGTH_PER_BYTE + 1]; /* Null terminated */
-
-   if (hexString == NULL || expectedHexStringLength == NULL)
-   {
-      return SMOS_RESULT_ERROR_NULL_POINTER;
-   }
-
-   if (hexStringLength < SMOS_HEX_STRING_MIN_LENGTH)
-   {
-      return SMOS_RESULT_ERROR_NOT_MIN_LENGTH_HEX_STRING;
-   }
-
-   strncpy(hexBuff, hexString + SMOS_HEX_STR_BYTECOUNT_OFFSET, HEX_STR_LENGTH_PER_BYTE);
-   hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
-   
-   return (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
-}
-
 smosResult_t SMoS::smos_DecodeHexString(
     const char *hexString,
     const uint16_t hexStringLength,
@@ -354,7 +329,6 @@ smosResult_t SMoS::smos_DecodeHexString(
 {
    uint8_t currentByte, i;
    char hexBuff[HEX_STR_LENGTH_PER_BYTE + 1]; /* Null terminated */
-
 
    if (hexString == NULL || message == NULL)
    {
@@ -430,8 +404,37 @@ smosResult_t SMoS::smos_DecodeHexString(
    return SMOS_RESULT_SUCCESS;
 }
 
+/* As bytes are being sent across the wire, it would be nice to know how many bytes
+   we need to make up a message. */
+smosResult_t SMoS::smos_GetExpectedHexStringLength(
+    const char *hexString,
+    const uint16_t hexStringLength,
+    uint8_t *expectedHexStringLength)
+{
+   char hexBuff[HEX_STR_LENGTH_PER_BYTE + 1]; /* Null terminated */
+
+   if (hexString == NULL || expectedHexStringLength == NULL)
+   {
+      return SMOS_RESULT_ERROR_NULL_POINTER;
+   }
+
+   if (hexStringLength < SMOS_HEX_STRING_MIN_LENGTH)
+   {
+      return SMOS_RESULT_ERROR_NOT_MIN_LENGTH_HEX_STRING;
+   }
+
+   strncpy(hexBuff, hexString + SMOS_HEX_STR_BYTECOUNT_OFFSET, HEX_STR_LENGTH_PER_BYTE);
+   hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
+   
+   return (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+}
+
 uint16_t SMoS::smos_GetMinimumHexStringLength(void)
 {
    return SMOS_HEX_STRING_MIN_LENGTH;
 }
 
+bool SMoS::smos_IsStartCode(const char c)
+{
+   return c == SMOS_START_CODE;
+}
