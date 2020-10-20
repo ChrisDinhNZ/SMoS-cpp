@@ -18,7 +18,7 @@
  ***********************/
 
 uint8_t SMoS::CreateChecksum(
-   const smosObject_t *message)
+   const SMoSObject *message)
 {
    uint8_t checksum, i;
 
@@ -41,13 +41,13 @@ uint8_t SMoS::CreateChecksum(
 
 bool SMoS::ValidateChecksum(
     const uint8_t checksum,
-    const smosObject_t *message)
+    const SMoSObject *message)
 {
    return checksum == CreateChecksum(message);
 }
 
 uint16_t SMoS::ConvertMessageToHexString(
-   const smosObject_t *message,
+   const SMoSObject *message,
    char *hexString)
 {
    uint8_t i;
@@ -84,7 +84,7 @@ uint16_t SMoS::ConvertMessageToHexString(
 }
 
 uint8_t SMoS::CalculateContextByteInfo(
-    const smosObject_t *message,
+    const SMoSObject *message,
     uint8_t contextByteIndex)
 {
    uint8_t tempByte = 0;
@@ -119,15 +119,15 @@ uint8_t SMoS::CalculateContextByteInfo(
  *** PUBLIC MEMBERS ***
  **********************/
 
-smosResult_t SMoS::smos_EncodeGetMessage(
+SMoSResult_e SMoS::smos_EncodeGetMessage(
     uint8_t byteCount,
-    smosContentType_t contentType,
+    SMoSContentType_e contentType,
     uint8_t contentTypeOptions,
     uint8_t messageId,
     const uint8_t *dataContent,
     char *hexString)
 {
-   smosObject_t message;
+   SMoSObject message;
 
    if (dataContent == NULL || hexString == NULL)
    {
@@ -162,15 +162,15 @@ smosResult_t SMoS::smos_EncodeGetMessage(
    return SMOS_RESULT_SUCCESS;
 }
 
-smosResult_t SMoS::smos_EncodePutMessage(
+SMoSResult_e SMoS::smos_EncodePutMessage(
     uint8_t byteCount,
-    smosContentType_t contentType,
+    SMoSContentType_e contentType,
     uint8_t contentTypeOptions,
     uint8_t messageId,
     const uint8_t *dataContent,
     char *hexString)
 {
-   smosObject_t message;
+   SMoSObject message;
 
    if (dataContent == NULL || hexString == NULL)
    {
@@ -205,17 +205,17 @@ smosResult_t SMoS::smos_EncodePutMessage(
    return SMOS_RESULT_SUCCESS;
 }
 
-smosResult_t SMoS::smos_EncodePiggyBackAckMessage(
+SMoSResult_e SMoS::smos_EncodePiggyBackAckMessage(
     uint8_t byteCount,
-    smosContentType_t contentType,
+    SMoSContentType_e contentType,
     uint8_t contentTypeOptions,
-    smosCodeClass_t codeClass,
-    smosCodeDetailResponse_t codeDetailResponse,
+    SMoSCodeClass_e codeClass,
+    SMoSCodeDetailResponse_e codeDetailResponse,
     uint8_t messageId,
     const uint8_t *dataContent,
     char *hexString)
 {
-   smosObject_t message;
+   SMoSObject message;
 
    if (dataContent == NULL || hexString == NULL)
    {
@@ -250,11 +250,11 @@ smosResult_t SMoS::smos_EncodePiggyBackAckMessage(
    return SMOS_RESULT_SUCCESS;
 }
 
-smosResult_t SMoS::smos_EncodeEmptyAckMessage(
+SMoSResult_e SMoS::smos_EncodeEmptyAckMessage(
          uint8_t messageId,
          char *hexString)
 {
-   smosObject_t message;
+   SMoSObject message;
 
    if (hexString == NULL)
    {
@@ -277,17 +277,17 @@ smosResult_t SMoS::smos_EncodeEmptyAckMessage(
    return SMOS_RESULT_SUCCESS;
 }
 
-smosResult_t SMoS::smos_EncodeNonConfirmableResponseMessage(
+SMoSResult_e SMoS::smos_EncodeNonConfirmableResponseMessage(
     uint8_t byteCount,
-    smosContentType_t contentType,
+    SMoSContentType_e contentType,
     uint8_t contentTypeOptions,
-    smosCodeClass_t codeClass,
-    smosCodeDetailResponse_t codeDetailResponse,
+    SMoSCodeClass_e codeClass,
+    SMoSCodeDetailResponse_e codeDetailResponse,
     uint8_t messageId,
     const uint8_t *dataContent,
     char *hexString)
 {
-   smosObject_t message;
+   SMoSObject message;
 
    if (dataContent == NULL || hexString == NULL)
    {
@@ -322,10 +322,10 @@ smosResult_t SMoS::smos_EncodeNonConfirmableResponseMessage(
    return SMOS_RESULT_SUCCESS;
 }
 
-smosResult_t SMoS::smos_DecodeHexString(
+SMoSResult_e SMoS::smos_DecodeHexString(
     const char *hexString,
     const uint16_t hexStringLength,
-    smosObject_t *message)
+    SMoSObject *message)
 {
    uint8_t currentByte, i;
    char hexBuff[HEX_STR_LENGTH_PER_BYTE + 1]; /* Null terminated */
@@ -406,7 +406,7 @@ smosResult_t SMoS::smos_DecodeHexString(
 
 /* As bytes are being sent across the wire, it would be nice to know how many bytes
    we need to make up a message. */
-smosResult_t SMoS::smos_GetExpectedHexStringLength(
+SMoSResult_e SMoS::smos_GetExpectedHexStringLength(
     const char *hexString,
     const uint16_t hexStringLength,
     uint8_t *expectedHexStringLength)

@@ -12,7 +12,7 @@
 
 #include <stdint.h>
 
-typedef enum smosDefinitions_t
+typedef enum SMoSDefinitions_e
 {
    /* Start code */
    SMOS_HEX_STR_START_CODE_OFFSET = 0,
@@ -82,7 +82,7 @@ typedef enum smosDefinitions_t
    HEX_STR_LENGTH_PER_BYTE = 2
 };
 
-typedef enum smosContextType_t
+typedef enum SMoSContextType_e
 {
    SMOS_CONTEXT_TYPE_CON = 0x00,
    SMOS_CONTEXT_TYPE_NON = 0x01,
@@ -90,13 +90,13 @@ typedef enum smosContextType_t
    SMOS_CONTEXT_TYPE_NACK = 0x03,
 };
 
-typedef enum smosContentType_t
+typedef enum SMoSContentType_e
 {
    SMOS_CONTENT_TYPE_GENERIC = 0x00,
    SMOS_CONTENT_TYPE_GATT = 0x01,
 };
 
-typedef enum smosCodeClass_t
+typedef enum SMoSCodeClass_e
 {
    SMOS_CODE_CLASS_REQ = 0x00,
    SMOS_CODE_CLASS_RESP_SUCCESS = 0x02,
@@ -104,7 +104,7 @@ typedef enum smosCodeClass_t
    SMOS_CODE_CLASS_RESP_SERVER_ERROR = 0x05,
 };
 
-typedef enum smosCodeDetailRequest_t
+typedef enum SMoSCodeDetailRequest_e
 {
    SMOS_CODE_DETAIL_GET = 0x01,
    SMOS_CODE_DETAIL_OBSERVE = SMOS_CODE_DETAIL_GET,
@@ -113,7 +113,7 @@ typedef enum smosCodeDetailRequest_t
    SMOS_CODE_DETAIL_DELETE = 0x04,
 };
 
-typedef enum smosCodeDetailResponse_t
+typedef enum SMoSCodeDetailResponse_e
 {
    SMOS_CODE_DETAIL_SUCCESS_CREATED = 0x01,
    SMOS_CODE_DETAIL_SUCCESS_DELETED = 0x02,
@@ -140,7 +140,7 @@ typedef enum smosCodeDetailResponse_t
    SMOS_CODE_DETAIL_SERVER_ERROR_PROXYING_NOT_SUPPORTED = 0x05
 };
 
-typedef enum smosResult_t
+typedef enum SMoSResult_e
 {
    SMOS_RESULT_UNKNOWN,
    SMOS_RESULT_SUCCESS,
@@ -156,7 +156,7 @@ typedef enum smosResult_t
 /**
  * Structure to hold the fields of an SMoS message.
  */
-typedef struct smosObject_t
+typedef struct SMoSObject
 {
    uint8_t startCode;
    uint8_t byteCount;
@@ -175,57 +175,57 @@ class SMoS
 {
    private:
       uint8_t CreateChecksum(
-         const smosObject_t *message);
+         const SMoSObject *message);
       bool ValidateChecksum(
          const uint8_t checksum,
-         const smosObject_t *message);
+         const SMoSObject *message);
       uint16_t ConvertMessageToHexString(
-         const smosObject_t *message,
+         const SMoSObject *message,
          char *hexString);
       uint8_t CalculateContextByteInfo(
-         const smosObject_t *message,
+         const SMoSObject *message,
          uint8_t contextByteIndex);
    public:      
-      smosResult_t smos_EncodeGetMessage(
+      SMoSResult_e smos_EncodeGetMessage(
          uint8_t byteCount,
-         smosContentType_t contentType,
+         SMoSContentType_e contentType,
          uint8_t contentTypeOptions,
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
-      smosResult_t smos_EncodePutMessage(
+      SMoSResult_e smos_EncodePutMessage(
          uint8_t byteCount,
-         smosContentType_t contentType,
+         SMoSContentType_e contentType,
          uint8_t contentTypeOptions,
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
-      smosResult_t smos_EncodePiggyBackAckMessage(
+      SMoSResult_e smos_EncodePiggyBackAckMessage(
          uint8_t byteCount,
-         smosContentType_t contentType,
+         SMoSContentType_e contentType,
          uint8_t contentTypeOptions,
-         smosCodeClass_t codeClass,
-         smosCodeDetailResponse_t codeDetailResponse,
+         SMoSCodeClass_e codeClass,
+         SMoSCodeDetailResponse_e codeDetailResponse,
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
-      smosResult_t smos_EncodeEmptyAckMessage(
+      SMoSResult_e smos_EncodeEmptyAckMessage(
          uint8_t messageId,
          char *hexString);
-      smosResult_t smos_EncodeNonConfirmableResponseMessage(
+      SMoSResult_e smos_EncodeNonConfirmableResponseMessage(
          uint8_t byteCount,
-         smosContentType_t contentType,
+         SMoSContentType_e contentType,
          uint8_t contentTypeOptions,
-         smosCodeClass_t codeClass,
-         smosCodeDetailResponse_t codeDetailResponse,
+         SMoSCodeClass_e codeClass,
+         SMoSCodeDetailResponse_e codeDetailResponse,
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
-      smosResult_t smos_DecodeHexString(
+      SMoSResult_e smos_DecodeHexString(
          const char *hexString,
          const uint16_t hexStringLength,
-         smosObject_t *message);
-      smosResult_t smos_GetExpectedHexStringLength(
+         SMoSObject *message);
+      SMoSResult_e smos_GetExpectedHexStringLength(
          const char *hexString,
          const uint16_t hexStringLength,
          uint8_t *expectedHexStringLength);
