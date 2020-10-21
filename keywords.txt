@@ -1,2 +1,2 @@
 SMoS        KEYWORD1
-smosObject  KEYWORD2
+SMoSObject  KEYWORD2
