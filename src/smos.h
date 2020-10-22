@@ -249,6 +249,7 @@ class SMoS
       bool smos_IsConfirmableRequest(const SMoSObject *message);
       bool smos_IsNonConfirmableResponse(const SMoSObject *message);
       bool smos_IsConfirmableResponse(const SMoSObject *message);
+      bool smos_IsResetMessage(const SMoSObject *message);
 };
 
 #endif
