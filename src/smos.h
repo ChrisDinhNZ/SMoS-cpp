@@ -174,18 +174,24 @@ typedef struct SMoSObject
 class SMoS
 {
    private:
+
       uint8_t CreateChecksum(
          const SMoSObject *message);
+
       bool ValidateChecksum(
          const uint8_t checksum,
          const SMoSObject *message);
+
       uint16_t ConvertMessageToHexString(
          const SMoSObject *message,
          char *hexString);
+
       uint8_t CalculateContextByteInfo(
          const SMoSObject *message,
          uint8_t contextByteIndex);
-   public:      
+
+   public:
+
       SMoSResult_e smos_EncodeGetMessage(
          uint8_t byteCount,
          SMoSContentType_e contentType,
@@ -193,6 +199,7 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
+
       SMoSResult_e smos_EncodePutMessage(
          uint8_t byteCount,
          SMoSContentType_e contentType,
@@ -200,6 +207,7 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
+
       SMoSResult_e smos_EncodePiggyBackAckMessage(
          uint8_t byteCount,
          SMoSContentType_e contentType,
@@ -209,9 +217,11 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
+
       SMoSResult_e smos_EncodeEmptyAckMessage(
          uint8_t messageId,
          char *hexString);
+
       SMoSResult_e smos_EncodeNonConfirmableResponseMessage(
          uint8_t byteCount,
          SMoSContentType_e contentType,
@@ -221,16 +231,21 @@ class SMoS
          uint8_t messageId,
          const uint8_t *dataContent,
          char *hexString);
+
       SMoSResult_e smos_DecodeHexString(
          const char *hexString,
          const uint16_t hexStringLength,
          SMoSObject *message);
+
       SMoSResult_e smos_GetExpectedHexStringLength(
          const char *hexString,
          const uint16_t hexStringLength,
          uint8_t *expectedHexStringLength);
+
       uint16_t smos_GetMinimumHexStringLength(void);
       bool smos_IsStartCode(const char c);
+
+      bool smos_IsNonConfirmableRequest(const SMoSObject *message);
 };
 
 #endif

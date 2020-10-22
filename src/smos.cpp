@@ -438,3 +438,8 @@ bool SMoS::smos_IsStartCode(const char c)
 {
    return c == SMOS_START_CODE;
 }
+
+bool SMoS::smos_IsNonConfirmableRequest(const SMoSObject *message)
+{
+   return (message->contextType == SMOS_CONTEXT_TYPE_NON && message->codeClass == SMOS_CODE_CLASS_REQ);
+}
