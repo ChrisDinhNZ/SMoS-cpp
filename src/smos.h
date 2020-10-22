@@ -246,6 +246,7 @@ class SMoS
       bool smos_IsStartCode(const char c);
 
       bool smos_IsNonConfirmableRequest(const SMoSObject *message);
+      bool smos_IsConfirmableRequest(const SMoSObject *message);
 };
 
 #endif
