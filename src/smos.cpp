@@ -467,7 +467,10 @@ bool SMoS::smos_IsResetMessage(const SMoSObject *message)
 
 bool SMoS::smos_IsEmptyAcknowledgement(const SMoSObject *message)
 {
-   /* Reset message are implicitly empty messages. The code class and code detail are ignored. */
    return (message->contextType == SMOS_CONTEXT_TYPE_ACK && message->codeClass == 0x00 && message->codeDetail == 0x00);
 }
 
+bool SMoS::smos_IsPiggybackAcknowledgement(const SMoSObject *message)
+{
+   return (message->contextType == SMOS_CONTEXT_TYPE_ACK && message->codeClass != SMOS_CODE_CLASS_REQ);
+}

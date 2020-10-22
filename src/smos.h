@@ -251,6 +251,7 @@ class SMoS
       bool smos_IsConfirmableResponse(const SMoSObject *message);
       bool smos_IsResetMessage(const SMoSObject *message);
       bool smos_IsEmptyAcknowledgement(const SMoSObject *message);
+      bool smos_IsPiggybackAcknowledgement(const SMoSObject *message);
 };
 
 #endif
