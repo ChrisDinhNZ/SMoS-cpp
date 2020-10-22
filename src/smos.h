@@ -250,6 +250,7 @@ class SMoS
       bool smos_IsNonConfirmableResponse(const SMoSObject *message);
       bool smos_IsConfirmableResponse(const SMoSObject *message);
       bool smos_IsResetMessage(const SMoSObject *message);
+      bool smos_IsEmptyAcknowledgement(const SMoSObject *message);
 };
 
 #endif
