@@ -448,3 +448,8 @@ bool SMoS::smos_IsConfirmableRequest(const SMoSObject *message)
 {
    return (message->contextType == SMOS_CONTEXT_TYPE_CON && message->codeClass == SMOS_CODE_CLASS_REQ);
 }
+
+bool SMoS::smos_IsNonConfirmableResponse(const SMoSObject *message)
+{
+   return (message->contextType == SMOS_CONTEXT_TYPE_NON && message->codeClass != SMOS_CODE_CLASS_REQ);
+}
