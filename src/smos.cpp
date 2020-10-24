@@ -129,7 +129,7 @@ SMoSResult_e SMoS::smos_EncodeGetMessage(
 {
    SMoSObject message;
 
-   if (dataContent == NULL || hexString == NULL)
+   if (hexString == NULL)
    {
       return SMOS_RESULT_ERROR_NULL_POINTER;
    }
@@ -151,7 +151,12 @@ SMoSResult_e SMoS::smos_EncodeGetMessage(
    message.codeDetail = SMOS_CODE_DETAIL_GET;
    message.messageId = messageId;
    message.tokenId = 0;
-   memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+
+   if (dataContent != NULL && byteCount > 0)
+   {
+      memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+   }
+
    message.checksum = CreateChecksum(&message);
 
    if (ConvertMessageToHexString(&message, hexString) == 0)
@@ -172,7 +177,7 @@ SMoSResult_e SMoS::smos_EncodePutMessage(
 {
    SMoSObject message;
 
-   if (dataContent == NULL || hexString == NULL)
+   if (hexString == NULL)
    {
       return SMOS_RESULT_ERROR_NULL_POINTER;
    }
@@ -194,7 +199,12 @@ SMoSResult_e SMoS::smos_EncodePutMessage(
    message.codeDetail = SMOS_CODE_DETAIL_PUT;
    message.messageId = messageId;
    message.tokenId = 0;
-   memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+
+   if (dataContent != NULL && byteCount > 0)
+   {
+      memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+   }
+
    message.checksum = CreateChecksum(&message);
 
    if (ConvertMessageToHexString(&message, hexString) == 0)
@@ -217,7 +227,7 @@ SMoSResult_e SMoS::smos_EncodePiggyBackAckMessage(
 {
    SMoSObject message;
 
-   if (dataContent == NULL || hexString == NULL)
+   if (hexString == NULL)
    {
       return SMOS_RESULT_ERROR_NULL_POINTER;
    }
@@ -239,7 +249,12 @@ SMoSResult_e SMoS::smos_EncodePiggyBackAckMessage(
    message.codeDetail = codeDetailResponse;
    message.messageId = messageId;
    message.tokenId = 0;
-   memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+
+   if (dataContent != NULL && byteCount > 0)
+   {
+      memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+   }
+
    message.checksum = CreateChecksum(&message);
 
    if (ConvertMessageToHexString(&message, hexString) == 0)
@@ -289,7 +304,7 @@ SMoSResult_e SMoS::smos_EncodeNonConfirmableResponseMessage(
 {
    SMoSObject message;
 
-   if (dataContent == NULL || hexString == NULL)
+   if (hexString == NULL)
    {
       return SMOS_RESULT_ERROR_NULL_POINTER;
    }
@@ -311,7 +326,12 @@ SMoSResult_e SMoS::smos_EncodeNonConfirmableResponseMessage(
    message.codeDetail = codeDetailResponse;
    message.messageId = messageId;
    message.tokenId = 0;
-   memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+
+   if (dataContent != NULL && byteCount > 0)
+   {
+      memcpy(message.dataContent, dataContent, sizeof(dataContent[0]) * byteCount);
+   }
+
    message.checksum = CreateChecksum(&message);
 
    if (ConvertMessageToHexString(&message, hexString) == 0)
@@ -346,7 +366,7 @@ SMoSResult_e SMoS::smos_DecodeHexString(
 
    /* Check Hex string length. Note that actual Hex string length will be truncated (ignored)
       if longer than expected Hex string length. */
-   if (hexStringLength < SMOS_HEX_STRING_MIN_LENGTH + currentByte)
+   if (hexStringLength < SMOS_HEX_STRING_MIN_LENGTH + currentByte * HEX_STR_LENGTH_PER_BYTE)
    {
       return SMOS_RESULT_ERROR_HEX_STRING_INCOMPLETE;
    }
@@ -409,9 +429,10 @@ SMoSResult_e SMoS::smos_DecodeHexString(
 SMoSResult_e SMoS::smos_GetExpectedHexStringLength(
     const char *hexString,
     const uint16_t hexStringLength,
-    uint8_t *expectedHexStringLength)
+    uint16_t *expectedHexStringLength)
 {
    char hexBuff[HEX_STR_LENGTH_PER_BYTE + 1]; /* Null terminated */
+   uint8_t byteCount;
 
    if (hexString == NULL || expectedHexStringLength == NULL)
    {
@@ -425,8 +446,12 @@ SMoSResult_e SMoS::smos_GetExpectedHexStringLength(
 
    strncpy(hexBuff, hexString + SMOS_HEX_STR_BYTECOUNT_OFFSET, HEX_STR_LENGTH_PER_BYTE);
    hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
-   
-   return (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+
+   byteCount = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
+
+   *expectedHexStringLength = SMOS_HEX_STRING_MIN_LENGTH + byteCount * HEX_STR_LENGTH_PER_BYTE;
+
+   return SMOS_RESULT_SUCCESS;
 }
 
 uint16_t SMoS::smos_GetMinimumHexStringLength(void)

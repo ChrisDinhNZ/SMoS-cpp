@@ -67,8 +67,11 @@ typedef enum SMoSDefinitions_e
    /* Checksum offset depends on Byte Count */
    SMOS_CHECKSUM_BYTE_LEN = 1,
 
-   /* SMoS minimum message length (i.e. when byte count is 0) */
+   /* SMoS minimum Hex string length (i.e. when byte count is 0) */
    SMOS_HEX_STRING_MIN_LENGTH = 11,
+
+   /* SMoS maximum Hex string length (i.e. when byte count is 255) */
+   SMOS_HEX_STRING_MAX_LENGTH = 521,
 
    /* SMoS maximum message length */
    SMOS_MESSAGE_BUFF_SIZE = SMOS_START_CODE_BYTE_LEN +
@@ -240,7 +243,7 @@ class SMoS
       SMoSResult_e smos_GetExpectedHexStringLength(
          const char *hexString,
          const uint16_t hexStringLength,
-         uint8_t *expectedHexStringLength);
+         uint16_t *expectedHexStringLength);
 
       uint16_t smos_GetMinimumHexStringLength(void);
       bool smos_IsStartCode(const char c);
