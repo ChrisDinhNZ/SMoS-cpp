@@ -90,7 +90,7 @@ typedef enum SMoSContextType_e
    SMOS_CONTEXT_TYPE_CON = 0x00,
    SMOS_CONTEXT_TYPE_NON = 0x01,
    SMOS_CONTEXT_TYPE_ACK = 0x02,
-   SMOS_CONTEXT_TYPE_NACK = 0x03,
+   SMOS_CONTEXT_TYPE_RST = 0x03,
 };
 
 typedef enum SMoSContentType_e

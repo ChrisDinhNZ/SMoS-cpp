@@ -487,7 +487,7 @@ bool SMoS::smos_IsConfirmableResponse(const SMoSObject *message)
 bool SMoS::smos_IsResetMessage(const SMoSObject *message)
 {
    /* Reset message are implicitly empty messages. The code class and code detail are ignored. */
-   return (message->contextType == SMOS_CONTEXT_TYPE_NACK);
+   return (message->contextType == SMOS_CONTEXT_TYPE_RST);
 }
 
 bool SMoS::smos_IsEmptyAcknowledgement(const SMoSObject *message)
