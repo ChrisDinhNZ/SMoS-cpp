@@ -245,7 +245,10 @@ class SMoS
          const uint16_t hexStringLength,
          uint16_t *expectedHexStringLength);
 
+      /* Returns the value of SMOS_HEX_STRING_MIN_LENGTH, this can be useful
+         when receiving data across the serial link one char at a time. */
       uint16_t smos_GetMinimumHexStringLength(void);
+
       bool smos_IsStartCode(const char c);
 
       bool smos_IsNonConfirmableRequest(const SMoSObject *message);
