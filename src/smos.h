@@ -14,17 +14,6 @@
 
 typedef enum SMoSDefinitions_e
 {
-   /* Start code */
-   SMOS_HEX_STR_START_CODE_OFFSET = 0,
-   SMOS_START_CODE_BYTE_LEN = 1,
-
-   /* Byte count */
-   SMOS_HEX_STR_BYTECOUNT_OFFSET = 1,
-   SMOS_COUNT_BYTE_LEN = 1,
-
-   /* Context Overall */
-   SMOS_DATA_CONTEXT_BYTE_LEN = 3,
-
    /* Context type */
    SMOS_HEX_STR_CONTEXT_TYPE_OFFSET = 3,
    SMOS_CONTEXT_TYPE_LSB_OFFSET = 6,
@@ -64,21 +53,11 @@ typedef enum SMoSDefinitions_e
    SMOS_HEX_STR_DATA_OFFSET = 9,
    SMOS_MAX_DATA_BYTE_LEN = 255,
 
-   /* Checksum offset depends on Byte Count */
-   SMOS_CHECKSUM_BYTE_LEN = 1,
-
    /* SMoS minimum Hex string length (i.e. when byte count is 0) */
    SMOS_HEX_STRING_MIN_LENGTH = 11,
 
    /* SMoS maximum Hex string length (i.e. when byte count is 255) */
    SMOS_HEX_STRING_MAX_LENGTH = 521,
-
-   /* SMoS maximum message length */
-   SMOS_MESSAGE_BUFF_SIZE = SMOS_START_CODE_BYTE_LEN +
-                            SMOS_COUNT_BYTE_LEN +
-                            SMOS_DATA_CONTEXT_BYTE_LEN +
-                            SMOS_MAX_DATA_BYTE_LEN +
-                            SMOS_CHECKSUM_BYTE_LEN,
 
    SMOS_START_CODE = 0x3A,
 
