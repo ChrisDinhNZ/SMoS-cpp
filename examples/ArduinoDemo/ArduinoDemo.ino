@@ -55,17 +55,17 @@ static void ResetHexString(void)
    hexStringLength = 0;
 }
 
-static void SetBuiltInLedState(ResourceState_e state)
+static void SetBuiltInLedState(uint8_t data)
 {
-   builtInLedResource.state = state;
-
-   if (state == RESOURCE_STATE_ON)
+   if (data == 0u)
    {
-      digitalWrite(LED_BUILTIN, HIGH);
+      builtInLedResource.state = RESOURCE_STATE_OFF;
+      digitalWrite(LED_BUILTIN, LOW);
    }
    else
    {
-      digitalWrite(LED_BUILTIN, LOW);
+      builtInLedResource.state = RESOURCE_STATE_ON;
+      digitalWrite(LED_BUILTIN, HIGH);
    }
 }
 
@@ -89,7 +89,7 @@ static void ProcessConfirmableRequest(SMoSObject const * const message)
          in the reponse because we are responding to a specific request (using the request message Id). */
       if (smosService.smos_EncodePiggyBackAckMessage(
               0,
-              0,
+              SMOS_CONTENT_TYPE_GENERIC,
               0,
               SMOS_CODE_CLASS_RESP_CLIENT_ERROR,
               SMOS_CODE_DETAIL_CLIENT_ERROR_NOT_FOUND,
@@ -114,7 +114,7 @@ static void ProcessConfirmableRequest(SMoSObject const * const message)
             /* There is a token ID so this is an observe request. We send an ACK with a METHOD_NOT_ALLOWED. */
             if (smosService.smos_EncodePiggyBackAckMessage(
                     0,
-                    0,
+                    SMOS_CONTENT_TYPE_GENERIC,
                     0,
                     SMOS_CODE_CLASS_RESP_CLIENT_ERROR,
                     SMOS_CODE_DETAIL_CLIENT_ERROR_METHOD_NOT_ALLOWED,
@@ -132,7 +132,7 @@ static void ProcessConfirmableRequest(SMoSObject const * const message)
 
             if (smosService.smos_EncodePiggyBackAckMessage(
                     2,
-                    0,
+                    SMOS_CONTENT_TYPE_GENERIC,
                     0,
                     SMOS_CODE_CLASS_RESP_SUCCESS,
                     SMOS_CODE_DETAIL_SUCCESS_CONTENT,
@@ -150,7 +150,7 @@ static void ProcessConfirmableRequest(SMoSObject const * const message)
          /* Since the switch doesn't support POST and DELETE, we send an ACK with a METHOD_NOT_ALLOWED. */
          if (smosService.smos_EncodePiggyBackAckMessage(
                  0,
-                 0,
+                 SMOS_CONTENT_TYPE_GENERIC,
                  0,
                  SMOS_CODE_CLASS_RESP_CLIENT_ERROR,
                  SMOS_CODE_DETAIL_CLIENT_ERROR_METHOD_NOT_ALLOWED,
@@ -169,7 +169,7 @@ static void ProcessConfirmableRequest(SMoSObject const * const message)
          /* Send an ACK with a CHANGED status. */
          if (smosService.smos_EncodePiggyBackAckMessage(
                  0,
-                 0,
+                 SMOS_CONTENT_TYPE_GENERIC,
                  0,
                  SMOS_CODE_CLASS_RESP_SUCCESS,
                  SMOS_CODE_DETAIL_SUCCESS_CHANGED,
