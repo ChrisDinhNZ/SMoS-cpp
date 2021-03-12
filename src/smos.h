@@ -138,7 +138,7 @@ typedef enum SMoSResult_e
 /**
  * Structure to hold the fields of an SMoS message.
  */
-typedef struct SMoSObject
+typedef struct SMoSObject_t
 {
    uint8_t startCode;
    uint8_t byteCount;
@@ -158,18 +158,18 @@ class SMoS
    private:
 
       uint8_t CreateChecksum(
-         const SMoSObject *message);
+         const SMoSObject_t *message);
 
       bool ValidateChecksum(
          const uint8_t checksum,
-         const SMoSObject *message);
+         const SMoSObject_t *message);
 
       uint16_t ConvertMessageToHexString(
-         const SMoSObject *message,
+         const SMoSObject_t *message,
          char *hexString);
 
       uint8_t CalculateContextByteInfo(
-         const SMoSObject *message,
+         const SMoSObject_t *message,
          uint8_t contextByteIndex);
 
    public:
@@ -217,7 +217,7 @@ class SMoS
       SMoSResult_e smos_DecodeHexString(
          const char *hexString,
          const uint16_t hexStringLength,
-         SMoSObject *message);
+         SMoSObject_t *message);
 
       SMoSResult_e smos_GetExpectedHexStringLength(
          const char *hexString,
@@ -230,13 +230,13 @@ class SMoS
 
       bool smos_IsStartCode(const char c);
 
-      bool smos_IsNonConfirmableRequest(const SMoSObject *message);
-      bool smos_IsConfirmableRequest(const SMoSObject *message);
-      bool smos_IsNonConfirmableResponse(const SMoSObject *message);
-      bool smos_IsConfirmableResponse(const SMoSObject *message);
-      bool smos_IsResetMessage(const SMoSObject *message);
-      bool smos_IsEmptyAcknowledgement(const SMoSObject *message);
-      bool smos_IsPiggybackAcknowledgement(const SMoSObject *message);
+      bool smos_IsNonConfirmableRequest(const SMoSObject_t *message);
+      bool smos_IsConfirmableRequest(const SMoSObject_t *message);
+      bool smos_IsNonConfirmableResponse(const SMoSObject_t *message);
+      bool smos_IsConfirmableResponse(const SMoSObject_t *message);
+      bool smos_IsResetMessage(const SMoSObject_t *message);
+      bool smos_IsEmptyAcknowledgement(const SMoSObject_t *message);
+      bool smos_IsPiggybackAcknowledgement(const SMoSObject_t *message);
 };
 
-#endif
+#endif /* #define SMOS_H */

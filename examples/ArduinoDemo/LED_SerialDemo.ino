@@ -34,7 +34,7 @@ typedef struct Resource
 };
 
 static SMoS smosService;
-static SMoSObject smosObject;
+static SMoSObject_t smosObject;
 static char hexString[SMOS_HEX_STRING_MAX_LENGTH + 1]; /* NULL terminated string */
 static uint16_t hexStringLength;
 static Resource builtInLedResource;
@@ -74,7 +74,7 @@ static ResourceState_e GetBuiltInLedState(void)
    return builtInLedResource.state;
 }
 
-static void ProcessConfirmableRequest(SMoSObject const * const message)
+static void ProcessConfirmableRequest(SMoSObject_t const * const message)
 {
    char respHexString[SMOS_HEX_STRING_MAX_LENGTH + 1]; /* NULL terminated string */
    uint8_t respData[DATA_ARRAY_MAX_SIZE];
@@ -183,7 +183,7 @@ static void ProcessConfirmableRequest(SMoSObject const * const message)
    }
 }
 
-static void ProcessSMoSMessage(SMoSObject const * const message)
+static void ProcessSMoSMessage(SMoSObject_t const * const message)
 {
    /* Currently we only cared about confirmable requests (i.e expects a
       response from the Arduino). */

@@ -18,7 +18,7 @@
  ***********************/
 
 uint8_t SMoS::CreateChecksum(
-   const SMoSObject *message)
+   const SMoSObject_t *message)
 {
    uint8_t checksum, i;
 
@@ -41,13 +41,13 @@ uint8_t SMoS::CreateChecksum(
 
 bool SMoS::ValidateChecksum(
     const uint8_t checksum,
-    const SMoSObject *message)
+    const SMoSObject_t *message)
 {
    return checksum == CreateChecksum(message);
 }
 
 uint16_t SMoS::ConvertMessageToHexString(
-   const SMoSObject *message,
+   const SMoSObject_t *message,
    char *hexString)
 {
    uint8_t i;
@@ -84,7 +84,7 @@ uint16_t SMoS::ConvertMessageToHexString(
 }
 
 uint8_t SMoS::CalculateContextByteInfo(
-    const SMoSObject *message,
+    const SMoSObject_t *message,
     uint8_t contextByteIndex)
 {
    uint8_t tempByte = 0;
@@ -127,7 +127,7 @@ SMoSResult_e SMoS::smos_EncodeGetMessage(
     const uint8_t *dataContent,
     char *hexString)
 {
-   SMoSObject message;
+   SMoSObject_t message;
 
    if (hexString == NULL)
    {
@@ -175,7 +175,7 @@ SMoSResult_e SMoS::smos_EncodePutMessage(
     const uint8_t *dataContent,
     char *hexString)
 {
-   SMoSObject message;
+   SMoSObject_t message;
 
    if (hexString == NULL)
    {
@@ -225,7 +225,7 @@ SMoSResult_e SMoS::smos_EncodePiggyBackAckMessage(
     const uint8_t *dataContent,
     char *hexString)
 {
-   SMoSObject message;
+   SMoSObject_t message;
 
    if (hexString == NULL)
    {
@@ -269,7 +269,7 @@ SMoSResult_e SMoS::smos_EncodeEmptyAckMessage(
          uint8_t messageId,
          char *hexString)
 {
-   SMoSObject message;
+   SMoSObject_t message;
 
    if (hexString == NULL)
    {
@@ -302,7 +302,7 @@ SMoSResult_e SMoS::smos_EncodeNonConfirmableResponseMessage(
     const uint8_t *dataContent,
     char *hexString)
 {
-   SMoSObject message;
+   SMoSObject_t message;
 
    if (hexString == NULL)
    {
@@ -345,7 +345,7 @@ SMoSResult_e SMoS::smos_EncodeNonConfirmableResponseMessage(
 SMoSResult_e SMoS::smos_DecodeHexString(
     const char *hexString,
     const uint16_t hexStringLength,
-    SMoSObject *message)
+    SMoSObject_t *message)
 {
    uint8_t currentByte, i;
    char hexBuff[HEX_STR_LENGTH_PER_BYTE + 1]; /* Null terminated */
@@ -464,38 +464,38 @@ bool SMoS::smos_IsStartCode(const char c)
    return c == SMOS_START_CODE;
 }
 
-bool SMoS::smos_IsNonConfirmableRequest(const SMoSObject *message)
+bool SMoS::smos_IsNonConfirmableRequest(const SMoSObject_t *message)
 {
    return (message->contextType == SMOS_CONTEXT_TYPE_NON && message->codeClass == SMOS_CODE_CLASS_REQ);
 }
 
-bool SMoS::smos_IsConfirmableRequest(const SMoSObject *message)
+bool SMoS::smos_IsConfirmableRequest(const SMoSObject_t *message)
 {
    return (message->contextType == SMOS_CONTEXT_TYPE_CON && message->codeClass == SMOS_CODE_CLASS_REQ);
 }
 
-bool SMoS::smos_IsNonConfirmableResponse(const SMoSObject *message)
+bool SMoS::smos_IsNonConfirmableResponse(const SMoSObject_t *message)
 {
    return (message->contextType == SMOS_CONTEXT_TYPE_NON && message->codeClass != SMOS_CODE_CLASS_REQ);
 }
 
-bool SMoS::smos_IsConfirmableResponse(const SMoSObject *message)
+bool SMoS::smos_IsConfirmableResponse(const SMoSObject_t *message)
 {
    return (message->contextType == SMOS_CONTEXT_TYPE_CON && message->codeClass != SMOS_CODE_CLASS_REQ);
 }
 
-bool SMoS::smos_IsResetMessage(const SMoSObject *message)
+bool SMoS::smos_IsResetMessage(const SMoSObject_t *message)
 {
    /* Reset message are implicitly empty messages. The code class and code detail are ignored. */
    return (message->contextType == SMOS_CONTEXT_TYPE_RST);
 }
 
-bool SMoS::smos_IsEmptyAcknowledgement(const SMoSObject *message)
+bool SMoS::smos_IsEmptyAcknowledgement(const SMoSObject_t *message)
 {
    return (message->contextType == SMOS_CONTEXT_TYPE_ACK && message->codeClass == 0x00 && message->codeDetail == 0x00);
 }
 
-bool SMoS::smos_IsPiggybackAcknowledgement(const SMoSObject *message)
+bool SMoS::smos_IsPiggybackAcknowledgement(const SMoSObject_t *message)
 {
    return (message->contextType == SMOS_CONTEXT_TYPE_ACK && message->codeClass != SMOS_CODE_CLASS_REQ);
 }
