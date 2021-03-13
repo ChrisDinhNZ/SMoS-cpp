@@ -187,7 +187,7 @@ static void ProcessSMoSMessage(SMoSObject_t const * const message)
 {
    /* Currently we only cared about confirmable requests (i.e expects a
       response from the Arduino). */
-   if (smosService.smos_IsConfirmableRequest(message))
+   if (smos_IsConfirmableRequest(message))
    {
        ProcessConfirmableRequest(message);
        return;
@@ -217,7 +217,7 @@ void loop()
       char c = Serial.read();
 
       /* If we get a start code, we will reset the hex string and start over. */
-      if (smosService.smos_IsStartCode(c))
+      if (smos_IsStartCode(c))
       {
          Serial.println("");
          ResetHexString();
@@ -240,14 +240,14 @@ void loop()
 
          /* We are reading data over the serial link, char by char. So make sure we read
             the whole string before processing it. */
-         if (hexStringLength < smosService.smos_GetMinimumHexStringLength() ||
+         if (hexStringLength < smos_GetMinimumHexStringLength() ||
              smosService.smos_GetExpectedHexStringLength(hexString, hexStringLength, &expectedHexStringLength) != SMOS_RESULT_SUCCESS ||
              hexStringLength < expectedHexStringLength)
          {
             return;
          }
 
-         result = smosService.smos_DecodeHexString(hexString, hexStringLength, &smosObject);
+         result = smos_DecodeFromHexString(hexString, hexStringLength, &smosObject);
 
          switch (result)
          {

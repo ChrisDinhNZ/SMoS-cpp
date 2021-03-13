@@ -121,8 +121,17 @@ static uint8_t smos_PackFieldIntoByte(const SMoSObject_t *message, SMoSPduFields
          break;
 
       case SMOS_PDU_FIELD_IDENTIFIER_CODE_DETAIL:
-         pduFieldPacked |=
-             ((message->codeDetail << SMOS_CODE_DETAIL_LSB_OFFSET) & SMOS_CODE_DETAIL_BIT_MASK);
+         /* We assume code class has been set. */
+         if (message->codeClass == SMOS_CODE_CLASS_REQ)
+         {
+            pduFieldPacked |=
+             ((message->codeDetailRequest << SMOS_CODE_DETAIL_LSB_OFFSET) & SMOS_CODE_DETAIL_BIT_MASK);
+         }
+         else
+         {
+            pduFieldPacked |=
+             ((message->codeDetailResponse << SMOS_CODE_DETAIL_LSB_OFFSET) & SMOS_CODE_DETAIL_BIT_MASK);
+         }
          break;
 
       case SMOS_PDU_FIELD_IDENTIFIER_MESSAGE_ID:
