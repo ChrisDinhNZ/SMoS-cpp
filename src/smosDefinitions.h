@@ -99,7 +99,7 @@ typedef enum SMoSDefinitions_e
       Header = 12 char
       Payload = 0 char
       Checksum = 2 char */
-   SMOS_HEX_STRING_MIN_LENGTH = 11,
+   SMOS_HEX_STRING_MIN_LENGTH = 15,
 
    /* SMoS maximum Hex string length (i.e. when byte count is 255)
       Start Code = 1 char
@@ -184,7 +184,6 @@ typedef enum SMoSResult_e
 
 typedef enum SMoSPduFields_e
 {
-   SMOS_PDU_FIELD_IDENTIFIER_START_CODE,
    SMOS_PDU_FIELD_IDENTIFIER_BYTE_COUNT,
    SMOS_PDU_FIELD_IDENTIFIER_VERSION,
    SMOS_PDU_FIELD_IDENTIFIER_CONTEXT_TYPE,
@@ -196,8 +195,7 @@ typedef enum SMoSPduFields_e
    SMOS_PDU_FIELD_IDENTIFIER_OBSERVE_FLAG,
    SMOS_PDU_FIELD_IDENTIFIER_OBSERVE_NOTIFICATION_INDEX,
    SMOS_PDU_FIELD_IDENTIFIER_RESOURCE_INDEX,
-   SMOS_PDU_FIELD_IDENTIFIER_PAYLOAD,
-   SMOS_PDU_FIELD_IDENTIFIER_CHECKSUM,
+   SMOS_PDU_FIELD_IDENTIFIER_PAYLOAD
 };
 
 /**
