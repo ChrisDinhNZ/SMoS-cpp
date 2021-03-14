@@ -215,7 +215,7 @@ typedef struct SMoSObject_t
    bool observeFlag;
    uint8_t observeNotificationIndex;
    uint8_t resourceIndex;
-   uint8_t payload[SMOS_MAX_DATA_BYTE_LEN];
+   uint8_t payload[SMOS_PAYLOAD_MAX_BYTE_COUNT];
 };
 
 #endif /* #define SMOS_DEFINITONS_H */
