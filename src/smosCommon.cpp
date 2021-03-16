@@ -73,9 +73,9 @@ uint16_t smos_GetMinimumHexStringLength(void)
    return SMOS_HEX_STRING_MIN_LENGTH;
 }
 
-bool smos_IsStartCode(const char c);
+bool smos_IsStartCode(const char c)
 {
-   return c == SMOS_START_CODE;
+   return c == SMOS_START_CODE_VALUE;
 }
 
 bool smos_IsConfirmableRequest(const SMoSObject_t *message)
@@ -151,7 +151,7 @@ static uint8_t smos_PackFieldIntoByte(const SMoSObject_t *message, SMoSPduFields
 
       case SMOS_PDU_FIELD_IDENTIFIER_RESOURCE_INDEX:
          pduFieldPacked |=
-             ((message->ResourceId << SMOS_RESOURCE_INDEX_LSB_OFFSET) & SMOS_RESOURCE_INDEX_BIT_MASK);
+             ((message->resourceIndex << SMOS_RESOURCE_INDEX_LSB_OFFSET) & SMOS_RESOURCE_INDEX_BIT_MASK);
          break;
 
       case SMOS_PDU_FIELD_IDENTIFIER_PAYLOAD:

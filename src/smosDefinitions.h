@@ -11,6 +11,9 @@
 #define SMOS_DEFINITONS_H
 
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 typedef enum SMoSDefinitions_e
 {
@@ -94,6 +97,9 @@ typedef enum SMoSDefinitions_e
    /* ASCII char ':' */
    SMOS_START_CODE_VALUE = 0x3A,
 
+   /* Current SMoS version ':' */
+   SMOS_VERSION_CURRENT = 0x01,
+
    /* SMoS minimum Hex string length (i.e. when byte count is 0)
       Start Code = 1 char
       Header = 12 char
@@ -117,12 +123,6 @@ typedef enum SMoSContextType_e
    SMOS_CONTEXT_TYPE_NON = 0x01,
    SMOS_CONTEXT_TYPE_ACK = 0x02,
    SMOS_CONTEXT_TYPE_RST = 0x03,
-};
-
-typedef enum SMoSContentType_e
-{
-   SMOS_CONTENT_TYPE_GENERIC = 0x00,
-   SMOS_CONTENT_TYPE_GATT = 0x01,
 };
 
 typedef enum SMoSCodeClass_e

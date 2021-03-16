@@ -1,7 +1,7 @@
 #ifndef SMOS_DECODER_H
 #define SMOS_DECODER_H
 
-#include "smosDefinitions.h"
+#include "smosCommon.h"
 
 SMoSResult_e smos_DecodeFromHexString(const char *hexString,
                                       const uint16_t hexStringLength,

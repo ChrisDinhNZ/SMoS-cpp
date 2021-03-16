@@ -58,7 +58,7 @@ SMoSResult_e smos_DecodeFromHexString(const char *hexString,
    currentByte = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
 
    message->version = (currentByte & SMOS_VERSION_BIT_MASK) >> SMOS_VERSION_LSB_OFFSET;
-   message->contextType = (currentByte & SMOS_CONTEXT_TYPE_BIT_MASK) >> SMOS_CONTEXT_TYPE_LSB_OFFSET;
+   message->contextType = (SMoSContextType_e)((currentByte & SMOS_CONTEXT_TYPE_BIT_MASK) >> SMOS_CONTEXT_TYPE_LSB_OFFSET);
    message->lastBlockFlag = (bool)((currentByte & SMOS_LAST_BLOCK_FLAG_BIT_MASK) >> SMOS_LAST_BLOCK_FLAG_LSB_OFFSET);
    message->blockSequenceIndex = (currentByte & SMOS_BLOCK_SEQUENCE_INDEX_BIT_MASK) >> SMOS_BLOCK_SEQUENCE_INDEX_LSB_OFFSET;
 
@@ -66,15 +66,15 @@ SMoSResult_e smos_DecodeFromHexString(const char *hexString,
    hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;
    currentByte = (uint8_t)strtoul(hexBuff, (char **)NULL, 16);
 
-   message->codeClass = (currentByte & SMOS_CODE_CLASS_BIT_MASK) >> SMOS_CODE_CLASS_LSB_OFFSET;
+   message->codeClass = (SMoSCodeClass_e)((currentByte & SMOS_CODE_CLASS_BIT_MASK) >> SMOS_CODE_CLASS_LSB_OFFSET);
 
    if (message->codeClass == SMOS_CODE_CLASS_REQ)
    {
-      message->codeDetailRequest = (currentByte & SMOS_CODE_DETAIL_BIT_MASK) >> SMOS_CODE_DETAIL_LSB_OFFSET;
+      message->codeDetailRequest = (SMoSCodeDetailRequest_e)((currentByte & SMOS_CODE_DETAIL_BIT_MASK) >> SMOS_CODE_DETAIL_LSB_OFFSET);
    }
    else
    {
-      message->codeDetailResponse = (currentByte & SMOS_CODE_DETAIL_BIT_MASK) >> SMOS_CODE_DETAIL_LSB_OFFSET;
+      message->codeDetailResponse = (SMoSCodeDetailResponse_e)((currentByte & SMOS_CODE_DETAIL_BIT_MASK) >> SMOS_CODE_DETAIL_LSB_OFFSET);
    }
 
    strncpy(hexBuff, hexString + SMOS_MESSAGE_ID_HEX_STR_OFFSET, HEX_STR_LENGTH_PER_BYTE);
@@ -100,7 +100,7 @@ SMoSResult_e smos_DecodeFromHexString(const char *hexString,
    for (i = 0; i < message->byteCount; i++)
    {
       strncpy(hexBuff,
-              hexString + SMOS_HEX_STR_DATA_OFFSET + HEX_STR_LENGTH_PER_BYTE * i,
+              hexString + SMOS_PAYLOAD_HEX_STR_OFFSET + HEX_STR_LENGTH_PER_BYTE * i,
               HEX_STR_LENGTH_PER_BYTE);
 
       hexBuff[HEX_STR_LENGTH_PER_BYTE] = 0;

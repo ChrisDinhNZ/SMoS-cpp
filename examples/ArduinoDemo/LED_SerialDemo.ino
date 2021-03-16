@@ -4,47 +4,19 @@
  * Copyright Chris Dinh 2020
  */
 
-#include "smos.h"
 #include "Arduino.h"
+#include "smosServer.h"
 
-typedef enum DataArrayIndexInfo_e
-{
-   DATA_ARRAY_INDEX_INFO_RESOURCE,
-   DATA_ARRAY_INDEX_INFO_RESOURCE_INFO,
-   DATA_ARRAY_MAX_SIZE
-};
+#define RESOURCE_ID_FOR_SWITCH 0x01
 
-typedef enum ResourceType_e
-{
-   RESOURCE_TYPE_SWITCH = 0x01,
-   /* Alarm resource not implemented */
-   RESOURCE_TYPE_ALARM = 0x02 
-};
-
-typedef enum ResourceState_e
-{
-   RESOURCE_STATE_OFF,
-   RESOURCE_STATE_ON
-};
-
-typedef struct Resource
-{
-   ResourceType_e    type;
-   ResourceState_e   state;
-};
-
-static SMoS smosService;
 static SMoSObject_t smosObject;
 static char hexString[SMOS_HEX_STRING_MAX_LENGTH + 1]; /* NULL terminated string */
 static uint16_t hexStringLength;
-static Resource builtInLedResource;
-
-static uint8_t data[DATA_ARRAY_MAX_SIZE];
+static bool switchIsOn = false;
 
 static void ResetBuiltInLedResource(void)
 {
-   builtInLedResource.type = RESOURCE_TYPE_SWITCH;
-   builtInLedResource.state = RESOURCE_STATE_OFF;
+   switchIsOn = false;
    pinMode(LED_BUILTIN, OUTPUT);
    digitalWrite(LED_BUILTIN, LOW);
 }
@@ -55,130 +27,125 @@ static void ResetHexString(void)
    hexStringLength = 0;
 }
 
-static void SetBuiltInLedState(uint8_t data)
+static void SetBuiltInLedState(bool on)
 {
-   if (data == 0u)
+   if (on)
    {
-      builtInLedResource.state = RESOURCE_STATE_OFF;
-      digitalWrite(LED_BUILTIN, LOW);
+      switchIsOn = true;
+      digitalWrite(LED_BUILTIN, HIGH);
    }
    else
    {
-      builtInLedResource.state = RESOURCE_STATE_ON;
-      digitalWrite(LED_BUILTIN, HIGH);
+      switchIsOn = false;
+      digitalWrite(LED_BUILTIN, LOW);
    }
 }
 
-static ResourceState_e GetBuiltInLedState(void)
+static bool IsBuiltInLedOn(void)
 {
-   return builtInLedResource.state;
+   return switchIsOn;
 }
 
-static void ProcessConfirmableRequest(SMoSObject_t const * const message)
+static void ProcessConfirmableRequest(SMoSObject_t const * const reqMessage)
 {
    char respHexString[SMOS_HEX_STRING_MAX_LENGTH + 1]; /* NULL terminated string */
-   uint8_t respData[DATA_ARRAY_MAX_SIZE];
+   SMoSObject_t respMessage;
 
    memset(respHexString, 0, sizeof(respHexString[0]) * (SMOS_HEX_STRING_MAX_LENGTH + 1));
-   memset(respData, 0, sizeof(respData[0]) * (DATA_ARRAY_MAX_SIZE));
+   memset(&respMessage, 0, sizeof(respMessage));
 
-   if (message->dataContent[DATA_ARRAY_INDEX_INFO_RESOURCE] == RESOURCE_TYPE_ALARM)
+   /* Populate response fields that are common. */
+      respMessage.version = SMOS_VERSION_CURRENT;
+      respMessage.lastBlockFlag = true;
+      respMessage.messageId = reqMessage->messageId;
+      respMessage.resourceIndex = reqMessage->resourceIndex;
+      respMessage.contextType = SMOS_CONTEXT_TYPE_ACK;
+
+   /* The only resource is the switch. Anything else, send a resource not found. */
+   if (reqMessage->resourceIndex != RESOURCE_ID_FOR_SWITCH)
    {
-      /* We haven't implemented support for the alarm reousrce so send an ACK with a 404.
-         Note that with a piggy-back acknowledgement response, we can omit some details
-         in the reponse because we are responding to a specific request (using the request message Id). */
-      if (smosService.smos_EncodePiggyBackAckMessage(
-              0,
-              SMOS_CONTENT_TYPE_GENERIC,
-              0,
-              SMOS_CODE_CLASS_RESP_CLIENT_ERROR,
-              SMOS_CODE_DETAIL_CLIENT_ERROR_NOT_FOUND,
-              message->messageId,
-              NULL,
-              respHexString) == SMOS_RESULT_SUCCESS)
+      respMessage.codeClass = SMOS_CODE_CLASS_RESP_CLIENT_ERROR;
+      respMessage.codeDetailResponse = SMOS_CODE_DETAIL_CLIENT_ERROR_NOT_FOUND;
+
+      if (smos_EncodeToHexString(&respMessage, respHexString) == SMOS_RESULT_SUCCESS)
       {
          Serial.println(respHexString);
+      }
+      else
+      {
+         Serial.println("Failed to encode hex string");
       }
 
       return;
    }
 
-   /* Request is about the Switch resource from here on in. */
-   respData[DATA_ARRAY_INDEX_INFO_RESOURCE] = RESOURCE_TYPE_SWITCH;
-
-   switch (message->codeDetail)
+   switch (reqMessage->codeDetailRequest)
    {
       case SMOS_CODE_DETAIL_GET:
-         if (message->tokenId != 0)
+         /* Note that we are ignoring observe request for now. Just return direct queries response. */
+         respMessage.byteCount = 0x01;
+         respMessage.codeClass = SMOS_CODE_CLASS_RESP_SUCCESS;
+         respMessage.codeDetailResponse = SMOS_CODE_DETAIL_SUCCESS_CONTENT;
+         respMessage.payload[0] = (uint8_t)IsBuiltInLedOn();
+
+         if (smos_EncodeToHexString(&respMessage, respHexString) == SMOS_RESULT_SUCCESS)
          {
-            /* There is a token ID so this is an observe request. We send an ACK with a METHOD_NOT_ALLOWED. */
-            if (smosService.smos_EncodePiggyBackAckMessage(
-                    0,
-                    SMOS_CONTENT_TYPE_GENERIC,
-                    0,
-                    SMOS_CODE_CLASS_RESP_CLIENT_ERROR,
-                    SMOS_CODE_DETAIL_CLIENT_ERROR_METHOD_NOT_ALLOWED,
-                    message->messageId,
-                    NULL,
-                    respHexString) == SMOS_RESULT_SUCCESS)
-            {
-               Serial.println(respHexString);
-            }
+            Serial.println(respHexString);
          }
          else
          {
-            /* Send an ACK with state of LED. */
-            respData[DATA_ARRAY_INDEX_INFO_RESOURCE_INFO] = GetBuiltInLedState();
-
-            if (smosService.smos_EncodePiggyBackAckMessage(
-                    2,
-                    SMOS_CONTENT_TYPE_GENERIC,
-                    0,
-                    SMOS_CODE_CLASS_RESP_SUCCESS,
-                    SMOS_CODE_DETAIL_SUCCESS_CONTENT,
-                    message->messageId,
-                    respData,
-                    respHexString) == SMOS_RESULT_SUCCESS)
-            {
-               Serial.println(respHexString);
-            }
+            Serial.println("Failed to encode hex string");
          }
          break;
 
       case SMOS_CODE_DETAIL_POST:
       case SMOS_CODE_DETAIL_DELETE:
-         /* Since the switch doesn't support POST and DELETE, we send an ACK with a METHOD_NOT_ALLOWED. */
-         if (smosService.smos_EncodePiggyBackAckMessage(
-                 0,
-                 SMOS_CONTENT_TYPE_GENERIC,
-                 0,
-                 SMOS_CODE_CLASS_RESP_CLIENT_ERROR,
-                 SMOS_CODE_DETAIL_CLIENT_ERROR_METHOD_NOT_ALLOWED,
-                 message->messageId,
-                 NULL,
-                 respHexString) == SMOS_RESULT_SUCCESS)
+         respMessage.codeClass = SMOS_CODE_CLASS_RESP_CLIENT_ERROR;
+         respMessage.codeDetailResponse = SMOS_CODE_DETAIL_CLIENT_ERROR_METHOD_NOT_ALLOWED;
+
+         if (smos_EncodeToHexString(&respMessage, respHexString) == SMOS_RESULT_SUCCESS)
          {
             Serial.println(respHexString);
+         }
+         else
+         {
+            Serial.println("Failed to encode hex string");
          }
          break;
 
       case SMOS_CODE_DETAIL_PUT:
          /* Update the built-in LED based on the request. */
-         SetBuiltInLedState(message->dataContent[DATA_ARRAY_INDEX_INFO_RESOURCE_INFO]);
+         if (reqMessage->byteCount == 0)
+         {
+            respMessage.codeClass = SMOS_CODE_CLASS_RESP_CLIENT_ERROR;
+            respMessage.codeDetailResponse = SMOS_CODE_DETAIL_CLIENT_ERROR_BAD_REQUEST;
 
-         /* Send an ACK with a CHANGED status. */
-         if (smosService.smos_EncodePiggyBackAckMessage(
-                 0,
-                 SMOS_CONTENT_TYPE_GENERIC,
-                 0,
-                 SMOS_CODE_CLASS_RESP_SUCCESS,
-                 SMOS_CODE_DETAIL_SUCCESS_CHANGED,
-                 message->messageId,
-                 NULL,
-                 respHexString) == SMOS_RESULT_SUCCESS)
+            if (smos_EncodeToHexString(&respMessage, respHexString) == SMOS_RESULT_SUCCESS)
+            {
+               Serial.println(respHexString);
+            }
+            else
+            {
+               Serial.println("Failed to encode hex string");
+            }
+
+            return;
+         }
+
+         SetBuiltInLedState((bool)(reqMessage->payload[0]));
+
+         respMessage.codeClass = SMOS_CODE_CLASS_RESP_SUCCESS;
+         respMessage.codeDetailResponse = SMOS_CODE_DETAIL_SUCCESS_CHANGED;
+
+         if (smos_EncodeToHexString(&respMessage, respHexString) == SMOS_RESULT_SUCCESS)
          {
             Serial.println(respHexString);
          }
+         else
+         {
+            Serial.println("Failed to encode hex string");
+         }
+
          break;
    }
 }
@@ -201,7 +168,6 @@ static void ProcessSMoSMessage(SMoSObject_t const * const message)
 
 void setup()
 {
-   memset(data, 0, sizeof(data));
    memset(&smosObject, 0, sizeof(smosObject));
    ResetHexString();
    ResetBuiltInLedResource();
@@ -241,7 +207,7 @@ void loop()
          /* We are reading data over the serial link, char by char. So make sure we read
             the whole string before processing it. */
          if (hexStringLength < smos_GetMinimumHexStringLength() ||
-             smosService.smos_GetExpectedHexStringLength(hexString, hexStringLength, &expectedHexStringLength) != SMOS_RESULT_SUCCESS ||
+             smos_GetExpectedHexStringLength(hexString, hexStringLength, &expectedHexStringLength) != SMOS_RESULT_SUCCESS ||
              hexStringLength < expectedHexStringLength)
          {
             return;
@@ -254,6 +220,7 @@ void loop()
             case SMOS_RESULT_ERROR_NOT_MIN_LENGTH_HEX_STRING:
             case SMOS_RESULT_ERROR_HEX_STRING_INCOMPLETE:
                /* String not long enough, do nothing for now. */
+               Serial.println("Incomplete hex string");
                break;
 
             case SMOS_RESULT_SUCCESS:
@@ -267,6 +234,7 @@ void loop()
             default:
                /* We received a bad hex string. There's nothing we can do about it. */
                ResetHexString();
+               Serial.println("Failed to decode hex string");
                break;
          }
       }
