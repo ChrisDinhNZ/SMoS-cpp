@@ -27,6 +27,7 @@ SMoSResult_e smos_EncodeToHexString(const SMoSObject_t *message, char *hexString
       return SMOS_RESULT_ERROR_NULL_POINTER;
    }
 
+   /* Hmm, don't think this is ever true. */
    if (message->byteCount > SMOS_PAYLOAD_MAX_BYTE_COUNT)
    {
       return SMOS_RESULT_ERROR_EXCEED_MAX_DATA_SIZE;
